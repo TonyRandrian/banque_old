@@ -76,7 +76,7 @@ CREATE TABLE type_pret
     FOREIGN KEY (modalite_id) REFERENCES modalite (id)
 );
 
-CREATE TABLE payements
+CREATE TABLE paiements
 (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     date_paiement DATE           NOT NULL,
@@ -87,13 +87,14 @@ CREATE TABLE payements
     FOREIGN KEY (employees_id) REFERENCES employees (id)
 );
 
-CREATE TABLE payement_modalite
+CREATE TABLE paiement_modalite
 (
     id              INT AUTO_INCREMENT PRIMARY KEY,
-    date_fin        DATE           NOT NULL,
+    date_retour     DATE           NOT NULL,
+    numero_paiement INTEGER,
     montant_a_payer DECIMAL(15, 2) NOT NULL,
-    payement_id     INT            NOT NULL,
-    FOREIGN KEY (payement_id) REFERENCES payements (id)
+    paiement_id     INT            NOT NULL,
+    FOREIGN KEY (paiement_id) REFERENCES paiements (id)
 );
 
 CREATE TABLE pret
