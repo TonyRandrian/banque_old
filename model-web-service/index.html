@@ -1,60 +1,85 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Gestion des étudiants</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    input, button { margin: 5px; padding: 5px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Gestion des étudiants</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        input, button {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>Gestion des étudiants</h1>
+<h1>Gestion des étudiants</h1>
 
-  <div>
+<div>
     <input type="hidden" id="id">
     <input type="text" id="nom" placeholder="Nom">
     <input type="text" id="prenom" placeholder="Prénom">
     <input type="email" id="email" placeholder="Email">
     <input type="number" id="age" placeholder="Âge">
     <button onclick="ajouterOuModifier()">Ajouter / Modifier</button>
-  </div>
+</div>
 
-  <table id="table-etudiants">
+<table id="table-etudiants">
     <thead>
-      <tr>
-        <th>ID</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Âge</th><th>Actions</th>
-      </tr>
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Email</th>
+        <th>Âge</th>
+        <th>Actions</th>
+    </tr>
     </thead>
     <tbody></tbody>
-  </table>
+</table>
 
-  <script>
-    const apiBase = "http://localhost:8888/tp-flightphp-crud/ws";
+<script>
+    const apiBase = "http://localhost/Web/S4/banque/model-web-service/ws";
 
     function ajax(method, url, data, callback) {
-      const xhr = new XMLHttpRequest();
-      xhr.open(method, apiBase + url, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          callback(JSON.parse(xhr.responseText));
-        }
-      };
-      xhr.send(data);
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, apiBase + url, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                callback(JSON.parse(xhr.responseText));
+            }
+        };
+        xhr.send(data);
     }
 
     function chargerEtudiants() {
-      ajax("GET", "/etudiants", null, (data) => {
-        const tbody = document.querySelector("#table-etudiants tbody");
-        tbody.innerHTML = "";
-        data.forEach(e => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
+        ajax("GET", "/etudiants", null, (data) => {
+            const tbody = document.querySelector("#table-etudiants tbody");
+            tbody.innerHTML = "";
+            data.forEach(e => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
             <td>${e.id}</td>
             <td>${e.nom}</td>
             <td>${e.prenom}</td>
@@ -65,59 +90,59 @@
               <button onclick='supprimerEtudiant(${e.id})'>🗑️</button>
             </td>
           `;
-          tbody.appendChild(tr);
+                tbody.appendChild(tr);
+            });
         });
-      });
     }
 
     function ajouterOuModifier() {
-      const id = document.getElementById("id").value;
-      const nom = document.getElementById("nom").value;
-      const prenom = document.getElementById("prenom").value;
-      const email = document.getElementById("email").value;
-      const age = document.getElementById("age").value;
+        const id = document.getElementById("id").value;
+        const nom = document.getElementById("nom").value;
+        const prenom = document.getElementById("prenom").value;
+        const email = document.getElementById("email").value;
+        const age = document.getElementById("age").value;
 
-      const data = `nom=${encodeURIComponent(nom)}&prenom=${encodeURIComponent(prenom)}&email=${encodeURIComponent(email)}&age=${age}`;
+        const data = `nom=${encodeURIComponent(nom)}&prenom=${encodeURIComponent(prenom)}&email=${encodeURIComponent(email)}&age=${age}`;
 
-      if (id) {
-        ajax("PUT", `/etudiants/${id}`, data, () => {
-          resetForm();
-          chargerEtudiants();
-        });
-      } else {
-        ajax("POST", "/etudiants", data, () => {
-          resetForm();
-          chargerEtudiants();
-        });
-      }
+        if (id) {
+            ajax("PUT", `/etudiants/${id}`, data, () => {
+                resetForm();
+                chargerEtudiants();
+            });
+        } else {
+            ajax("POST", "/etudiants", data, () => {
+                resetForm();
+                chargerEtudiants();
+            });
+        }
     }
 
     function remplirFormulaire(e) {
-      document.getElementById("id").value = e.id;
-      document.getElementById("nom").value = e.nom;
-      document.getElementById("prenom").value = e.prenom;
-      document.getElementById("email").value = e.email;
-      document.getElementById("age").value = e.age;
+        document.getElementById("id").value = e.id;
+        document.getElementById("nom").value = e.nom;
+        document.getElementById("prenom").value = e.prenom;
+        document.getElementById("email").value = e.email;
+        document.getElementById("age").value = e.age;
     }
 
     function supprimerEtudiant(id) {
-      if (confirm("Supprimer cet étudiant ?")) {
-        ajax("DELETE", `/etudiants/${id}`, null, () => {
-          chargerEtudiants();
-        });
-      }
+        if (confirm("Supprimer cet étudiant ?")) {
+            ajax("DELETE", `/etudiants/${id}`, null, () => {
+                chargerEtudiants();
+            });
+        }
     }
 
     function resetForm() {
-      document.getElementById("id").value = "";
-      document.getElementById("nom").value = "";
-      document.getElementById("prenom").value = "";
-      document.getElementById("email").value = "";
-      document.getElementById("age").value = "";
+        document.getElementById("id").value = "";
+        document.getElementById("nom").value = "";
+        document.getElementById("prenom").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("age").value = "";
     }
 
     chargerEtudiants();
-  </script>
+</script>
 
 </body>
 </html>
