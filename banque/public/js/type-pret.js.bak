@@ -1,0 +1,68 @@
+// CRUD Type Pret JS
+const apiBase = "/banque/model-web-service/ws/";
+
+function chargerTypePrets() {
+    ajax("GET", apiBase, "type-prets", null, (data) => {
+        const tbody = document.querySelector("#table-type-prets tbody");
+        tbody.innerHTML = "";
+        data.forEach(e => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${e.type_pret_id}</td>
+                <td>${e.libelle}</td>
+                <td>${e.taux}</td>
+                <td>${e.duree}</td>
+                <td>
+                  <button onclick='remplirFormulaire(${JSON.stringify(e)})'>✏️</button>
+                  <button onclick='supprimerTypePret(${e.type_pret_id})'>🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+}
+
+function ajouterOuModifier() {
+    const id = document.getElementById("id").value;
+    const libelle = document.getElementById("libelle").value;
+    const taux = document.getElementById("taux").value;
+    const duree = document.getElementById("duree").value;
+
+    const data = `libelle=${encodeURIComponent(libelle)}&taux=${taux}&duree=${duree}`;
+
+    if (id) {
+        ajax("PUT", apiBase, `type-prets/${id}", data, () => {
+            resetForm();
+            chargerTypePrets();
+        });
+    } else {
+        ajax("POST", apiBase, "type-prets", data, () => {
+            resetForm();
+            chargerTypePrets();
+        });
+    }
+}
+
+function remplirFormulaire(e) {
+    document.getElementById("id").value = e.type_pret_id;
+    document.getElementById("libelle").value = e.libelle;
+    document.getElementById("taux").value = e.taux;
+    document.getElementById("duree").value = e.duree;
+}
+
+function supprimerTypePret(id) {
+    if (confirm("Supprimer ce type de prêt ?")) {
+        ajax("DELETE", apiBase, `type-prets/${id}", null, () => {
+            chargerTypePrets();
+        });
+    }
+}
+
+function resetForm() {
+    document.getElementById("id").value = "";
+    document.getElementById("libelle").value = "";
+    document.getElementById("taux").value = "";
+    document.getElementById("duree").value = "";
+}
+
+document.addEventListener("DOMContentLoaded", chargerTypePrets);
